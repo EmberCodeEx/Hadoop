@@ -1,0 +1,114 @@
+What is Hadoop?
+	-Framework to store big data.
+	-Can store any format unlike RDBMS
+	-Written in Java; is an object.
+
+Distributed Computing:
+	-Master, Slave architecture
+	-Servers are commodity hardware (unbranded)
+	-Hadoop handles failures hence we can buy cheap servers that may fail
+	-Simple initial implementation but hard to convert from data warehousing to big data solution
+
+Hadoop Architecture:
+	-HDFS, YARN, Map Reduce
+	-HDFS -> Storage
+	-YARN -> Resource Manager
+	-Map Reduce -> Processing
+
+	-HDFS -> Hadoop Distributed Filesystem: -Master has a process called namenode, slaves will be running processes
+						 called datanode. Hadoop doesnt care what youre storing.
+						-IMP: Once a file is stored, it cannot be edited.
+						-Only sequential access, not random access.
+						-Read whole data and process it. Appending is possible. Solutions possible.
+						-Hadoop's master node accessed through a gateway node.
+						-Suppose you want to upload 192 MB data onto the cluster,
+						 namenode will tell you a block size (configurable) => 
+						 block size is the maximum amount of data that you can store on the cluster.
+						-So, for 192 MB, it will be divided into 3 blocks automatically by client.
+						-Namenode(Master) then stores the blocks on the datanodes.
+						-Data is usually stored on different machines. Why? For parallel processing.
+
+						-Q. How does Hadoop handle failure?
+						-A. Each block has a replication factor based off of which data gets replicated on
+						 other machines so, if replication factor is 3 then 3 copies of data stored 
+						 on 3 different datanodes. Replication factor can be changed as needed.
+
+						-Namenode stores the metadata; data about where each block is stored, etc.
+						-Problem: Central point of failure.
+						-Solution: 2 namenodes -> 1 active and 1 passive.
+
+						-Also data in datanodes can be backedup on classification basis, i.e. importance.
+
+	-Hadoop has 3 releases; 1,2 and 3.
+	-Hadoop 2 is the one used right now.
+	-No replication in Hadoop 3.
+	-How do you handle unstructured data? (Videos, images)
+	-Unstructured data is uncommon but needs to be converted to binary or some structured format but not practical.
+
+	-Oozie:					-Schedules cluster access. Write program in oozie and contact hadoop admin.
+						-Programs are queued. Multiple queues according to resource needs.
+						
+
+Ideally, you will have 5000 datanodes per namenode to avoid slowdown.
+
+Hadoop Ecosystem:
+	-Uses ELT (Extract, Load, Transform) Model.
+	-There is a tool called Sqoop which bring data from any SQL systems to hdfs.	
+		-CDC used for sensitive data -> Stores data changes.
+	-Flume is a tool used to gather unstructured data/JSON/Flat File and send it to hdfs.
+		-KAFKA is an intermediary storage facility (can store for upto 7 days).
+			-KAFKA is its own hadoop cluster so it stores the data on those clusters. Can be accessed by multiple people.
+			-This data stored on KAFKA is analysed by Spark Streaming.
+				-Spark Streaming analyses data in real time.
+
+		-Q. Why not gather data directly from kafka instead of using flume?
+		-A. Because flume just pulls without disturbing data. 
+		 Kafka cannot pull on its own; needs a tool installed (Kafka producer) on the existing setup.
+		 Also kafka allows for multiple access no any number of applications can access the data while flume is point to point.
+
+	
+	-HDFS Processing:
+		-MapReduce: Used for Batch Processing. Default Framework.
+		-PIG: Scripting tool. Replaced by Spark.
+		-HIVE: Allows you to write SQL on top of Hadoop but it just translates queries to a MapReduce Program. Slow.
+		-Spark: In memory execution system. Batch Processing. Faster than MapReduce Programs. Near realtime.
+			-Spark and HIVE can work together. Good for big queries.
+
+		-For small queries there are engines like IMPALA/HAWQ/LLAP/PRESTO. Unreliable.
+
+		-HBase: -No SQL Realtime Database of Hadoop installed on hdfs. Has an API. Can do random reads and writes.
+			-Has its own Language.
+
+	-MapReduce:
+		-Divide and conquer.
+		-For example, MongoDB uses MapReduce.
+		-Can be written in any language. Java preferred.
+		-Used for large amounts of data.
+		-Traditional programming -> data comes to programs; eg: people from all over Pakistan coming to Karachi to vote.
+		-Big Data Scenerio (Mapt Reduce) -> program goes to the data instead; eg: each region in Pakistan gets own voting booth.
+		-Same program can be parallely ran on multiple machines. Each machine produces local result. Local results collected to produce final result.
+		
+		-2 Programs needed -> Mapper Program and Reducer Program:
+			-Mapper Program replicated and run on each machine at the same time.
+			-When Mapper completes, each machine will produce a local result.
+			-Reducer Program collects all local results and produces final output. 
+				-May have 1 or more reducer (depending on the number of datanodes).
+
+	-MapReduce Working:
+		-Rule 1: Output of a Mapper Program is always in key-value pair form.
+
+	-YARN (Yet Another Resouce Negotiator) :
+		-Resource Manager for Hadoop Systems.
+		-Handles execution of Mapper Programs in the datanodes.
+
+Working:
+	-Jar File consisting of a Mapper, a Reducer and a Driver.
+	-Driver sends the Mapper first to the YARN which will run the Mapper on all datanodes.
+
+
+
+
+Advantages:
+	-Parallel Processing.
+	-Low Dependencies.
+	-Failure handling.									
